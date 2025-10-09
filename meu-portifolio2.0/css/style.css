@@ -1,0 +1,254 @@
+/* 1. CONFIGURAÇÕES GLOBAIS E VARIÁVEIS */
+:root {
+  --cor-fundo: #121212;
+  --cor-fundo-secundario: #1e1e1e;
+  --cor-primaria: #007bff;
+  --cor-primaria-hover: #0056b3;
+  --cor-texto: #e0e0e0;
+  --cor-texto-secundario: #a0a0a0;
+  --cor-borda: #333333;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: var(--cor-fundo);
+  color: var(--cor-texto);
+  line-height: 1.6;
+}
+
+h2, h3 {
+    font-weight: 600;
+}
+
+/* 2. CABEÇALHO E NAVEGAÇÃO */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 5%;
+  background-color: rgba(18, 18, 18, 0.8);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--cor-borda);
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
+.logo a {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--cor-texto);
+  text-decoration: none;
+}
+
+nav ul {
+  list-style: none;
+  display: flex;
+}
+
+nav ul li {
+  margin-left: 2rem;
+}
+
+nav ul li a {
+  color: var(--cor-texto);
+  text-decoration: none;
+  font-weight: 400;
+  transition: color 0.3s ease;
+}
+
+nav ul li a:hover {
+  color: var(--cor-primaria);
+}
+
+/* 3. SEÇÕES PRINCIPAIS */
+main {
+  padding-top: 60px; /* Para compensar o cabeçalho fixo */
+}
+
+section {
+  padding: 4rem 5%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+section h2 {
+  text-align: center;
+  font-size: 2.5rem;
+  margin-bottom: 2rem;
+  color: var(--cor-texto);
+}
+
+/* 4. SEÇÃO "SOBRE MIM" */
+#sobre {
+  padding-top: 2rem;
+}
+
+.sobre-mim-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+  flex-wrap: wrap; /* Para telas menores */
+}
+
+.imagem-perfil img {
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid var(--cor-primaria);
+  box-shadow: 0 0 20px rgba(0, 123, 255, 0.3);
+}
+
+.sobre-mim-texto {
+  flex-basis: 50%;
+}
+
+.sobre-mim-texto h3 {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+}
+
+.sobre-mim-texto p {
+    color: var(--cor-texto-secundario);
+    margin-bottom: 1rem;
+}
+
+/* 5. SEÇÃO "PROJETOS" */
+.projetos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.projeto-card {
+  background-color: var(--cor-fundo-secundario);
+  border: 1px solid var(--cor-borda);
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.projeto-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 30px rgba(0, 123, 255, 0.2);
+}
+
+.projeto-card img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.projeto-card h3 {
+  font-size: 1.5rem;
+  margin: 1rem 1.5rem;
+}
+
+.projeto-card p {
+  color: var(--cor-texto-secundario);
+  margin: 0 1.5rem;
+  flex-grow: 1; /* Faz o parágrafo ocupar o espaço disponível */
+}
+
+.projeto-links {
+  padding: 1.5rem;
+  display: flex;
+  gap: 1rem;
+}
+
+/* 6. SEÇÃO "CONTATO" */
+#contato {
+  text-align: center;
+}
+
+#contato p {
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    color: var(--cor-texto-secundario);
+}
+
+.contato-links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+/* 7. BOTÕES E LINKS */
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background-color: var(--cor-primaria);
+  color: #ffffff;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: 600;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn:hover {
+  background-color: var(--cor-primaria-hover);
+  transform: translateY(-2px);
+}
+
+.btn.btn-secondary {
+    background-color: transparent;
+    border: 1px solid var(--cor-primaria);
+    color: var(--cor-primaria);
+}
+
+.btn.btn-secondary:hover {
+    background-color: var(--cor-primaria);
+    color: #ffffff;
+}
+
+
+/* 8. RODAPÉ */
+footer {
+  text-align: center;
+  padding: 2rem 5%;
+  margin-top: 2rem;
+  background-color: var(--cor-fundo-secundario);
+  border-top: 1px solid var(--cor-borda);
+  color: var(--cor-texto-secundario);
+}
+
+/* 9. RESPONSIVIDADE */
+@media (max-width: 768px) {
+  header {
+    flex-direction: column;
+    padding: 1rem 2rem;
+  }
+  
+  nav ul {
+    margin-top: 1rem;
+  }
+
+  nav ul li {
+    margin: 0 0.5rem;
+  }
+  
+  section {
+    padding: 3rem 5%;
+  }
+  
+  .sobre-mim-container {
+      text-align: center;
+  }
+}
