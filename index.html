@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechCompare - Comparador de Notebooks Inteligente</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --success: #4cc9f0;
+            --warning: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--dark);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 2.5em;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        
+        .tagline {
+            color: var(--gray);
+            font-size: 1.2em;
+        }
+        
+        .dashboard {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .stats-bar {
+            background: var(--secondary);
+            color: white;
+            padding: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-value {
+            font-size: 2.2em;
+            font-weight: 700;
+            color: var(--success);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .controls {
+            padding: 25px;
+            background: var(--light);
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .filter-btn {
+            padding: 12px 24px;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .filter-btn.active,
+        .filter-btn:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(67, 97, 238, 0.3);
+        }
+        
+        .search-container {
+            display: flex;
+            justify-content: center;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: white;
+            border-radius: 25px;
+            padding: 12px 25px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .search-box input {
+            border: none;
+            outline: none;
+            padding: 8px;
+            width: 100%;
+            font-size: 1em;
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            min-height: 600px;
+        }
+        
+        .charts-panel {
+            padding: 30px;
+            border-right: 1px solid #e9ecef;
+            background: #f8f9fa;
+        }
+        
+        .products-panel {
+            padding: 30px;
+            background: white;
+            max-height: 800px;
+            overflow-y: auto;
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            border-left: 4px solid var(--primary);
+        }
+        
+        .chart-title {
+            font-size: 1.3em;
+            color: var(--secondary);
+            margin-bottom: 20px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .product-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-left: 5px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+        
+        .product-card.highlight {
+            border-left-color: var(--success);
+            background: linear-gradient(135deg, #fff, #f8fff9);
+        }
+        
+        .product-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+        
+        .product-brand {
+            font-weight: 700;
+            font-size: 1.3em;
+            color: var(--secondary);
+        }
+        
+        .store-tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.75em;
+            font-weight: 700;
+            margin-left: 10px;
+            background: var(--primary);
+            color: white;
+        }
+        
+        .price-section {
+            text-align: right;
+        }
+        
+        .current-price {
+            font-size: 1.6em;
+            font-weight: 700;
+            color: var(--warning);
+        }
+        
+        .old-price {
+            text-decoration: line-through;
+            color: var(--gray);
+            font-size: 0.9em;
+        }
+        
+        .discount-badge {
+            background: var(--warning);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 700;
+            margin-top: 5px;
+            display: inline-block;
+        }
+        
+        .specs-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        
+        .spec-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+        }
+        
+        .spec-label {
+            font-weight: 600;
+            color: var(--gray);
+            font-size: 0.9em;
+            min-width: 130px;
+        }
+        
+        .spec-value {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+        
+        .product-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .score {
+            background: var(--primary);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: 700;
+        }
+        
+        .buy-btn {
+            background: var(--primary);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .buy-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: var(--gray);
+            margin-top: 20px;
+        }
+        
+        @media (max-width: 1024px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            .charts-panel {
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-bar {
+                grid-template-columns: 1fr;
+            }
+            
+            .specs-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .product-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .price-section {
+                text-align: left;
+            }
+            
+            .filters {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .filter-btn {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-laptop-code"></i> TechCompare
+            </div>
+            <div class="tagline">
+                Encontre o notebook perfeito com nosso comparador inteligente
+            </div>
+        </header>
+        
+        <div class="dashboard">
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-products">12</div>
+                    <div class="stat-label">Notebooks Comparados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avg-price">R$ 2.449</div>
+                    <div class="stat-label">Preço Médio</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="avg-discount">14.5%</div>
+                    <div class="stat-label">Desconto Médio</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="stores-count">6</div>
+                    <div class="stat-label">Lojas Parceiras</div>
+                </div>
+            </div>
+            
+            <div class="controls">
+                <div class="filters">
+                    <button class="filter-btn active" onclick="filterProducts('all')">
+                        <i class="fas fa-layer-group"></i> Todos
+                    </button>
+                    <button class="filter-btn" onclick="filterProducts('i5')">
+                        <i class="fas fa-microchip"></i> Intel i5
+                    </button>
+                    <button class="filter-btn" onclick="filterProducts('ryzen')">
+                        <i class="fas fa-bolt"></i> AMD Ryzen
+                    </button>
+                    <button class="filter-btn" onclick="filterProducts('under2500')">
+                        <i class="fas fa-wallet"></i> Até R$ 2.500
+                    </button>
+                    <button class="filter-btn" onclick="filterProducts('best')">
+                        <i class="fas fa-crown"></i> Melhores Ofertas
+                    </button>
+                </div>
+                
+                <div class="search-container">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="search-input" placeholder="Pesquisar por marca, modelo ou especificação..." onkeyup="searchProducts()">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content">
+                <div class="charts-panel">
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <i class="fas fa-chart-line"></i> Comparação de Preços
+                        </div>
+                        <canvas id="priceChart" height="250"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <div class="chart-title">
+                            <i class="fas fa-rocket"></i> Performance vs Preço
+                        </div>
+                        <canvas id="performanceChart" height="250"></canvas>
+                    </div>
+                </div>
+                
+                <div class="products-panel">
+                    <div id="products-container">
+                        <!-- Produtos serão carregados aqui -->
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p><i class="fas fa-sync-alt"></i> Atualizado automaticamente - <span id="current-date"></span></p>
+            <p>TechCompare &copy; 2024 - Comparador de Notebooks Inteligente</p>
+        </footer>
+    </div>
+
+    <script>
+        // Dados dos produtos
+        const products = [
+            {
+                id: 1,
+                brand: "LENOVO",
+                model: "Ideapad 1 15AMN7",
+                processor: "AMD Ryzen 3 7320U",
+                ram: 8,
+                storage: 256,
+                ssd: true,
+                screen: "15.6\" HD",
+                os: "Windows 11",
+                priceOriginal: 2883.90,
+                priceDiscount: 2039.15,
+                discount: 14,
+                store: "kabum",
+                url: "https://www.kabum.com.br/produto/902707",
+                performance: 7.0,
+                value: 8.5,
+                highlight: true,
+                specs: ["8GB RAM", "Windows 11 Incluído", "Eficiência Energética"],
+                issues: ["Tela HD (1366x768)", "Processador entry-level"]
+            },
+            {
+                id: 2,
+                brand: "ASUS",
+                model: "Vivobook Go 15",
+                processor: "AMD Ryzen 5 7520U",
+                ram: 8,
+                storage: 256,
+                ssd: true,
+                screen: "15.6\" Full HD",
+                os: "Linux",
+                priceOriginal: 2209.15,
+                priceDiscount: 2209.15,
+                discount: 0,
+                store: "kabum",
+                url: "https://www.kabum.com.br/produto/579676",
+                performance: 8.0,
+                value: 8.0,
+                highlight: true,
+                specs: ["Ryzen 5", "8GB RAM", "Tela Full HD", "Performance Superior"],
+                issues: ["Sem desconto", "Linux (necessita Windows)"]
+            },
+            {
+                id: 3,
+                brand: "DELL",
+                model: "Inspiron 15 3520",
+                processor: "Intel Core i5-1235U",
+                ram: 8,
+                storage: 512,
+                ssd: true,
+                screen: "15.6\" Full HD",
+                os: "Windows 11",
+                priceOriginal: 3299.00,
+                priceDiscount: 2799.00,
+                discount: 15,
+                store: "amazon",
+                url: "#",
+                performance: 8.0,
+                value: 8.2,
+                highlight: true,
+                specs: ["Qualidade Dell", "Tela Full HD", "Windows 11", "512GB SSD"],
+                issues: ["Design mais simples"]
+            },
+            {
+                id: 4,
+                brand: "SAMSUNG",
+                model: "Book Core i5",
+                processor: "Intel Core i5-1135G7",
+                ram: 8,
+                storage: 256,
+                ssd: true,
+                screen: "15.6\" Full HD",
+                os: "Windows 11",
+                priceOriginal: 3199.00,
+                priceDiscount: 2399.00,
+                discount: 25,
+                store: "magalu",
+                url: "#",
+                performance: 7.0,
+                value: 8.5,
+                specs: ["Marca Samsung", "Windows 11", "Bateria Longa"],
+                issues: ["Processador 11ª geração"]
+            },
+            {
+                id: 5,
+                brand: "AVEL",
+                model: "Zero Core i5",
+                processor: "Intel Core i5-12450H",
+                ram: 8,
+                storage: 256,
+                ssd: true,
+                screen: "15.6\" Full HD 144Hz",
+                os: "Windows 11",
+                priceOriginal: 2999.00,
+                priceDiscount: 2699.00,
+                discount: 10,
+                store: "terabyte",
+                url: "#",
+                performance: 8.5,
+                value: 8.3,
+                highlight: true,
+                specs: ["Processador H", "Tela 144Hz", "Performance Gamer"],
+                issues: ["Marca menos conhecida"]
+            }
+        ];
+
+        // Atualizar data
+        document.getElementById('current-date').textContent = new Date().toLocaleDateString('pt-BR');
+
+        // Inicializar gráficos
+        function initializeCharts() {
+            // Gráfico de Preços
+            const priceCtx = document.getElementById('priceChart').getContext('2d');
+            new Chart(priceCtx, {
+                type: 'bar',
+                data: {
+                    labels: products.map(p => p.brand),
+                    datasets: [{
+                        label: 'Preço com Desconto',
+                        data: products.map(p => p.priceDiscount),
+                        backgroundColor: '#4361ee',
+                        borderColor: '#3a0ca3',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Preço (R$)'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de Performance vs Preço
+            const performanceCtx = document.getElementById('performanceChart').getContext('2d');
+            new Chart(performanceCtx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: 'Notebooks',
+                        data: products.map(p => ({
+                            x: p.performance,
+                            y: p.priceDiscount
+                        })),
+                        backgroundColor: products.map(p => p.highlight ? '#f72585' : '#4361ee'),
+                        pointRadius: 8,
+                        pointHoverRadius: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Performance (0-10)'
+                            },
+                            min: 6,
+                            max: 9
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Preço (R$)'
+                            },
+                            min: 1900,
+                            max: 3000
+                        }
+                    }
+                }
+            });
+        }
+
+        // Renderizar produtos
+        function renderProducts(filter = 'all', searchTerm = '') {
+            const container = document.getElementById('products-container');
+            
+            let filteredProducts = products.filter(product => {
+                switch(filter) {
+                    case 'i5': 
+                        return product.processor.includes('i5');
+                    case 'ryzen': 
+                        return product.processor.includes('Ryzen');
+                    case 'under2500': 
+                        return product.priceDiscount <= 2500;
+                    case 'best': 
+                        return product.highlight;
+                    default: 
+                        return true;
+                }
+            });
+
+            // Aplicar busca
+            if (searchTerm) {
+                const term = searchTerm.toLowerCase();
+                filteredProducts = filteredProducts.filter(product => 
+                    product.brand.toLowerCase().includes(term) ||
+                    product.model.toLowerCase().includes(term) ||
+                    product.processor.toLowerCase().includes(term)
+                );
+            }
+
+            container.innerHTML = filteredProducts.map(product => `
+                <div class="product-card ${product.highlight ? 'highlight' : ''}">
+                    <div class="product-header">
+                        <div>
+                            <span class="product-brand">${product.brand}</span>
+                            <span class="store-tag">${product.store.toUpperCase()}</span>
+                            ${product.highlight ? '<span style="color: #f72585; margin-left: 10px;"><i class="fas fa-crown"></i> DESTAQUE</span>' : ''}
+                        </div>
+                        <div class="price-section">
+                            <div class="current-price">R$ ${product.priceDiscount.toFixed(2)}</div>
+                            ${product.discount > 0 ? `
+                                <div class="old-price">R$ ${product.priceOriginal.toFixed(2)}</div>
+                                <div class="discount-badge">-${product.discount}% OFF</div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    
+                    <div style="color: #666; margin-bottom: 10px;">${product.model}</div>
+                    <div style="color: #3a0ca3; font-weight: 600; margin-bottom: 15px;">
+                        <i class="fas fa-microchip"></i> ${product.processor}
+                    </div>
+                    
+                    <div class="specs-grid">
+                        <div class="spec-item">
+                            <span class="spec-label"><i class="fas fa-microchip"></i> Processador:</span>
+                            <span class="spec-value">${product.processor}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label"><i class="fas fa-memory"></i> RAM:</span>
+                            <span class="spec-value">${product.ram}GB</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label"><i class="fas fa-hdd"></i> Armazenamento:</span>
+                            <span class="spec-value">${product.storage}GB ${product.ssd ? 'SSD' : 'HDD'}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label"><i class="fas fa-desktop"></i> Tela:</span>
+                            <span class="spec-value">${product.screen}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label"><i class="fas fa-cog"></i> Sistema:</span>
+                            <span class="spec-value">${product.os}</span>
+                        </div>
+                        <div class="spec-item">
+                            <span class="spec-label"><i class="fas fa-store"></i> Loja:</span>
+                            <span class="spec-value">${product.store.toUpperCase()}</span>
+                        </div>
+                    </div>
+
+                    <div style="margin: 15px 0;">
+                        <div style="font-weight: 600; color: #666; margin-bottom: 8px;">
+                            <i class="fas fa-check-circle"></i> Vantagens:
+                        </div>
+                        <div>
+                            ${product.specs.map(spec => `
+                                <span style="background: #ecf0f1; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px; display: inline-block; margin-bottom: 5px;">
+                                    ${spec}
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    ${product.issues && product.issues.length > 0 ? `
+                        <div style="margin: 15px 0;">
+                            <div style="font-weight: 600; color: #666; margin-bottom: 8px;">
+                                <i class="fas fa-exclamation-triangle"></i> Considerações:
+                            </div>
+                            <div>
+                                ${product.issues.map(issue => `
+                                    <span style="background: #fff5f5; padding: 4px 10px; border-radius: 12px; font-size: 0.85em; margin-right: 8px; display: inline-block; margin-bottom: 5px; color: #e74c3c;">
+                                        ${issue}
+                                    </span>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <div class="product-footer">
+                        <div class="score">
+                            <i class="fas fa-chart-line"></i> Score: ${product.performance}/10
+                        </div>
+                        <a href="${product.url}" target="_blank" class="buy-btn">
+                            <i class="fas fa-shopping-cart"></i> Ver Oferta
+                        </a>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Filtros
+        function filterProducts(filter) {
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            const searchTerm = document.getElementById('search-input').value;
+            renderProducts(filter, searchTerm);
+        }
+
+        // Pesquisa
+        function searchProducts() {
+            const searchTerm = document.getElementById('search-input').value;
+            const activeFilter = document.querySelector('.filter-btn.active').getAttribute('onclick').match(/'([^']+)'/)[1];
+            renderProducts(activeFilter, searchTerm);
+        }
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            renderProducts();
+        });
+    </script>
+</body>
+</html>
